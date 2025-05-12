@@ -1,0 +1,15 @@
+{
+    "name": "dev-arena",
+    "private": true,
+    "workspaces": [
+        "apps/*"
+    ],
+    "devDependencies": {
+        "turbo": "^2.5.3"
+    },
+    "scripts": {
+        "dev": "turbo run dev",
+        "build": "turbo run build"
+    },
+    "packageManager": "npm@10.2.3"
+}

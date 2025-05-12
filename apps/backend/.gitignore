@@ -1,0 +1,7 @@
+dist/
+node_modules/
+generated/
+.env
+seed.js
+
+.turbo

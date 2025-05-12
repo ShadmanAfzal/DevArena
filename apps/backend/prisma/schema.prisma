@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProblemDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model User {
+  userId           String             @id @default(uuid())
+  firstName        String
+  lastName         String
+  email            String             @unique
+  profilePicture   String?
+  lastActive       DateTime           @default(now())
+  SolvedProblem    SolvedProblem[]
+  AttemptedProblem AttemptedProblem[]
+}
+
+model SolvedProblem {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [userId])
+  userId    String
+  problem   Problem  @relation(fields: [problemId], references: [id])
+  problemId String
+  solvedAt  DateTime @default(now())
+  code      String
+
+  @@unique([userId, problemId])
+}
+
+model AttemptedProblem {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [userId])
+  userId      String
+  problem     Problem  @relation(fields: [problemId], references: [id])
+  problemId   String
+  attemptedAt DateTime @default(now())
+  code        String
+
+  @@unique([userId, problemId])
+}
+
+model Problem {
+  id                String             @id @default(uuid())
+  title             String
+  description       String
+  examples          ProblemExample[]
+  problemDifficulty ProblemDifficulty  @default(EASY)
+  slug              String             @unique
+  testCases         TestCase[]
+  topics            String[]
+  initialCode       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  SolvedProblem     SolvedProblem[]
+  AttemptedProblem  AttemptedProblem[]
+}
+
+model ProblemExample {
+  id          String   @id @default(uuid())
+  Input       String
+  Output      String
+  Explanation String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  problem     Problem? @relation(fields: [problemId], references: [id])
+  problemId   String?
+}
+
+model TestCase {
+  id        String   @id @default(uuid())
+  input     String
+  output    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  problem   Problem? @relation(fields: [problemId], references: [id])
+  problemId String?
+}
