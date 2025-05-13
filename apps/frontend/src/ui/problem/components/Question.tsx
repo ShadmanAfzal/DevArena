@@ -17,9 +17,9 @@ export const Question = () => {
           className={twMerge(
             "capitalize bg-white/5 px-2 py-1 rounded-full text-sm",
             problem.problemDifficulty === ProblemDifficulty.EASY &&
-              "text-green-500",
+              "text-teal-500",
             problem.problemDifficulty === ProblemDifficulty.MEDIUM &&
-              "text-yellow-500",
+              "text-orange-500",
             problem.problemDifficulty === ProblemDifficulty.HARD &&
               "text-red-500"
           )}

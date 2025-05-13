@@ -1,7 +1,7 @@
-const BASE_URL = "http://localhost:3000/api";
+const env = import.meta.env;
 
 export const getAllProblems = async () => {
-  const response = await fetch(`${BASE_URL}/problem`, {
+  const response = await fetch(`${env.VITE_BACKEND_API_ENDPOINT}/problem`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -22,12 +22,15 @@ export const getAllProblems = async () => {
 };
 
 export const getProblemBySlug = async (slug: string) => {
-  const response = await fetch(`${BASE_URL}/problem/${slug}`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  const response = await fetch(
+    `${env.VITE_BACKEND_API_ENDPOINT}/problem/${slug}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
 
   const result = await response.json();
 

@@ -1,9 +1,9 @@
 import { User } from "../store/userStore";
 
-const BASE_URL = "http://localhost:3000/api";
+const env = import.meta.env;
 
 export const loginUser = async (code: string): Promise<User> => {
-  const response = await fetch(`${BASE_URL}/auth/login`, {
+  const response = await fetch(`${env.VITE_BACKEND_API_ENDPOINT}/auth/login`, {
     method: "POST",
     body: JSON.stringify({ code }),
     headers: {

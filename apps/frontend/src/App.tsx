@@ -9,6 +9,8 @@ import { fetchUserInfo } from "./api/user";
 function App() {
   const { isLoggedIn, setUser } = useUserStore((state) => state);
 
+  const env = import.meta.env;
+
   useEffect(() => {
     const init = async () => {
       const user = await fetchUserInfo();
@@ -20,7 +22,7 @@ function App() {
   }, [isLoggedIn, setUser]);
 
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={env.VITE_CLIENT_ID}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />

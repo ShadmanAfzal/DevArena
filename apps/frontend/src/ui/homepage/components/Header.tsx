@@ -21,8 +21,11 @@ export const Header = () => {
 
   return (
     <div className="flex flex-row gap-4 justify-between py-4 mx-4">
-      <div className="text-xl">
-        <Link to="/">🚀 DevArena</Link>
+      <div className="text-3xl font-bold">
+        <Link to="/" className="flex flex-row">
+          <div className="">arena</div>
+          <div className="text-yellow-500">.dev</div>
+        </Link>
       </div>
       {!isLoggedIn ? (
         <div

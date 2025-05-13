@@ -1,6 +1,6 @@
 import Language from "../types/Language";
 
-const BASE_URL = "http://localhost:3000/api";
+const env = import.meta.env;
 
 const toBase64 = (str: string) => {
   const utf8Bytes = new TextEncoder().encode(str);
@@ -18,7 +18,7 @@ export const executeExpression = async (
 ) => {
   if (!expression) return;
 
-  const response = await fetch(`${BASE_URL}/execute`, {
+  const response = await fetch(`${env.VITE_BACKEND_API_ENDPOINT}/execute`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

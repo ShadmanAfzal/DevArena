@@ -1,9 +1,9 @@
 import { User } from "../store/userStore";
 
-const BASE_URL = "http://localhost:3000/api";
+const env = import.meta.env;
 
 export const fetchUserInfo = async (): Promise<User | null> => {
-  const response = await fetch(`${BASE_URL}/user/me`, {
+  const response = await fetch(`${env.VITE_BACKEND_API_ENDPOINT}/user/me`, {
     method: "GET",
     credentials: "include",
     headers: {
