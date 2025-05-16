@@ -1,14 +1,6 @@
 {
     "tasks": {
-        "prisma:migrate": {
-            "outputs": [
-                "node_modules/@prisma/client/**"
-            ]
-        },
         "dev": {
-            "dependsOn": [
-                "prisma:migrate"
-            ],
             "persistent": true,
             "cache": false
         },
