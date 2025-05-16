@@ -3,10 +3,10 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
-import executeRouter from "./router/execute";
-import problemRouter from "./router/problem";
-import authRouter from "./router/auth";
-import userRouter from "./router/user";
+import executeRouter from "./router/execute.js";
+import problemRouter from "./router/problem.js";
+import authRouter from "./router/auth.js";
+import userRouter from "./router/user.js";
 
 const app = express();
 

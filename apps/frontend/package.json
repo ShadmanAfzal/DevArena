@@ -19,9 +19,11 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.5.3",
+    "react-tiny-popover": "^8.1.6",
     "tailwind-merge": "^3.2.0",
     "tailwindcss": "^4.1.5",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.4",
+    "@dev-arena/shared": "*"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

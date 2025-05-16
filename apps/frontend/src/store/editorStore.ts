@@ -1,5 +1,5 @@
+import { Language } from "@dev-arena/shared";
 import { create } from "zustand";
-import Language from "../types/Language";
 
 type EditorStoreType = {
   language: string;

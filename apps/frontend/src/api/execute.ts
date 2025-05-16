@@ -1,4 +1,4 @@
-import Language from "../types/Language";
+import { Language } from "@dev-arena/shared";
 
 const env = import.meta.env;
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { executeExpression } from "../controller/execute";
+import { executeExpression } from "../controller/execute.js";
 
 const router = Router();
 

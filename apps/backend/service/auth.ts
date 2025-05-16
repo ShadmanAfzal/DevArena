@@ -74,7 +74,7 @@ const fetchUserInfo = async (
 
 const createToken = async (userId: string) => {
   return jwt.sign({ sub: userId }, process.env.JWT_SECRET!, {
-    expiresIn: "1h",
+    expiresIn: "1d",
   });
 };
 

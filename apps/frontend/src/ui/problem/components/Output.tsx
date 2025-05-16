@@ -22,7 +22,7 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
   };
 
   return (
-    <div className="h-[40%] bg-card mr-4 mt-1.5 mb-4 ml-1 rounded-2xl p-4 custom-scrollbar overflow-y-scroll">
+    <div className="h-[40%] bg-card mr-4 mt-1.5 mb-4 ml-1 rounded-2xl p-4 custom-scrollbar overflow-y-auto">
       <div className="flex flex-row items-center justify-between">
         <div>
           {problem?.testCases.map((_, index) => {

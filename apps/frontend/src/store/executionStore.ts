@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import Language from "../types/Language";
 import { executeExpression } from "../api/execute";
 import { useEditorStore } from "./editorStore";
+import { Language } from "@dev-arena/shared";
 
 type ExecutionStoreType = {
   result: string[];

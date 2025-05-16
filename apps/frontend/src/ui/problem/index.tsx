@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as monaco from "monaco-editor";
 import { useExecutionStore } from "../../store/executionStore";
-import Header from "./components/Header";
 import { Question } from "./components/Question";
 import Output from "./components/Output";
 import { Editor } from "./components/Editor";
@@ -35,9 +34,8 @@ const Problem = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      <Header />
-      <div className="flex-1 flex flex-row overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="h-full flex flex-row overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center items-center w-full">
             <LoaderCircle className="animate-spin" />

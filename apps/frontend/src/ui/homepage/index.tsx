@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { ProblemDifficulty, useProblemsStore } from "../../store/problemStore";
 import { Link } from "react-router";
 import { twMerge } from "tailwind-merge";
-import { Header } from "./components/Header";
 import { Check, Circle } from "lucide-react";
 
 const Homepage = () => {
@@ -14,54 +13,51 @@ const Homepage = () => {
   }, [fetchProblems]);
 
   return (
-    <div>
-      <Header />
-      <div className="overflow-x-auto px-4 py-2">
-        <div className="min-w-full rounded-lg">
-          {problems.map((problem, index) => {
-            return (
-              <Link to={`/problem/${problem.slug}`}>
-                <div
-                  key={index}
-                  className={twMerge(
-                    "grid",
-                    index % 2 === 0 ? "rounded-md bg-card" : ""
-                  )}
-                  style={{ gridTemplateColumns: "50% 20% 1fr" }}
-                >
-                  <div className="flex flex-row items-center gap-4 py-3 px-6">
-                    <div>
-                      {index % 2 === 0 ? (
-                        <Check size={13} className="text-green-500" />
-                      ) : (
-                        <Circle size={13} />
-                      )}
-                    </div>
-                    <div>
-                      {index + 1}. {problem.title}
-                    </div>
-                  </div>
-                  <div
-                    className={twMerge(
-                      "py-3 px-6 capitalize font-semibold",
-                      problem.problemDifficulty === ProblemDifficulty.EASY &&
-                        "text-teal-500",
-                      problem.problemDifficulty === ProblemDifficulty.MEDIUM &&
-                        "text-yellow-400",
-                      problem.problemDifficulty === ProblemDifficulty.HARD &&
-                        "text-red-500"
+    <div className="overflow-x-auto px-4 py-1">
+      <div className="min-w-full rounded-lg">
+        {problems.map((problem, index) => {
+          return (
+            <Link to={`/problem/${problem.slug}`}>
+              <div
+                key={index}
+                className={twMerge(
+                  "grid",
+                  index % 2 === 0 ? "rounded-md bg-card" : ""
+                )}
+                style={{ gridTemplateColumns: "50% 20% 1fr" }}
+              >
+                <div className="flex flex-row items-center gap-4 py-3 px-6">
+                  <div>
+                    {index % 2 === 0 ? (
+                      <Check size={13} className="text-green-500" />
+                    ) : (
+                      <Circle size={13} />
                     )}
-                  >
-                    {problem.problemDifficulty.toLocaleLowerCase()}
                   </div>
-                  <div className="py-3 px-6">
-                    <span>{problem.topics.join(", ")}</span>
+                  <div>
+                    {index + 1}. {problem.title}
                   </div>
                 </div>
-              </Link>
-            );
-          })}
-        </div>
+                <div
+                  className={twMerge(
+                    "py-3 px-6 capitalize",
+                    problem.problemDifficulty === ProblemDifficulty.EASY &&
+                      "text-green-500",
+                    problem.problemDifficulty === ProblemDifficulty.MEDIUM &&
+                      "text-yellow-400",
+                    problem.problemDifficulty === ProblemDifficulty.HARD &&
+                      "text-red-500"
+                  )}
+                >
+                  {problem.problemDifficulty.toLocaleLowerCase()}
+                </div>
+                <div className="py-3 px-6">
+                  <span>{problem.topics.join(", ")}</span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

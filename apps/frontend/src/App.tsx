@@ -5,9 +5,10 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useEffect } from "react";
 import { useUserStore } from "./store/userStore";
 import { fetchUserInfo } from "./api/user";
+import { Header } from "./ui/homepage/components/Header";
 
 function App() {
-  const { isLoggedIn, setUser } = useUserStore((state) => state);
+  const { setUser } = useUserStore((state) => state);
 
   const env = import.meta.env;
 
@@ -19,17 +20,20 @@ function App() {
     };
 
     init();
-  }, [isLoggedIn, setUser]);
+  }, [setUser]);
 
   return (
-    <GoogleOAuthProvider clientId={env.VITE_CLIENT_ID}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/problem/:slug" element={<Problem />} />
-        </Routes>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+    <div className="h-screen flex flex-col">
+      <GoogleOAuthProvider clientId={env.VITE_CLIENT_ID}>
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/problem/:slug" element={<Problem />} />
+          </Routes>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
+    </div>
   );
 }
 

@@ -2,14 +2,17 @@
     "name": "dev-arena",
     "private": true,
     "workspaces": [
-        "apps/*"
+        "apps/*",
+        "packages/*"
     ],
     "devDependencies": {
         "turbo": "^2.5.3"
     },
+    "type": "module",
     "scripts": {
         "dev": "turbo run dev",
-        "build": "turbo run build"
+        "build": "turbo run build",
+        "postinstall": "turbo run build --filter=@dev-arena/shared"
     },
     "packageManager": "npm@10.2.3"
 }

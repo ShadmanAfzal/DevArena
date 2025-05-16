@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
-import authService from "../service/auth";
+import authService from "../service/auth.js";
 
 const prisma = new PrismaClient();
 
@@ -45,6 +45,16 @@ export const loginUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.log("Error occured while login user", error);
     res.status(500).json({ error: "Error occured while login user" });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("auth-token");
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.log("Error occured while logout user", error);
+    res.status(500).json({ error: "Error occured while logout user" });
   }
 };
 

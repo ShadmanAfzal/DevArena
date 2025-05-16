@@ -20,7 +20,7 @@ export const Header = () => {
   });
 
   return (
-    <div className="flex flex-row gap-4 justify-between py-4 mx-4">
+    <div className="flex flex-row gap-4 justify-between py-4 mx-8">
       <div className="text-3xl font-bold">
         <Link to="/" className="flex flex-row">
           <div className="">arena</div>
@@ -28,12 +28,12 @@ export const Header = () => {
         </Link>
       </div>
       {!isLoggedIn ? (
-        <div
-          className="cursor-pointer hover:bg-card transition-all duration-200 ease-in-out px-3 py-1.5 rounded-lg"
+        <button
+          className="cursor-pointer hover:bg-card transition-all duration-200 ease-in-out px-2 py-1 rounded-lg"
           onClick={() => login()}
         >
           Login
-        </div>
+        </button>
       ) : (
         <ProfileAvatar />
       )}

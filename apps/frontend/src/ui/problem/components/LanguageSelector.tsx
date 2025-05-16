@@ -1,23 +1,48 @@
+import { ArrowDown, ChevronDown } from "lucide-react";
 import { useEditorStore } from "../../../store/editorStore";
-import Language from "../../../types/Language";
+import { useState } from "react";
+import { Popover } from "react-tiny-popover";
+import { Language } from "@dev-arena/shared";
 
 export const LanguageSelector = () => {
-  const setLanguage = useEditorStore((state) => state.changeLanguage);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const { language, changeLanguage } = useEditorStore((state) => state);
 
   return (
-    <div className="flex flex-row gap-2 items-center">
-      <select
-        className="outline-none"
-        onChange={(e) => setLanguage(e.currentTarget.value as Language)}
+    <Popover
+      isOpen={isPopoverOpen}
+      positions={["top", "bottom"]}
+      onClickOutside={() => setIsPopoverOpen(false)}
+      content={
+        <div className="bg-card rounded-lg p-2 flex flex-col gap-1 shadow-2xl drop-shadow-neutral-950 border border-white/5">
+          {Object.keys(Language).map((lang) => {
+            return (
+              <div
+                key={lang}
+                onClick={() => {
+                  changeLanguage(lang.toLowerCase() as Language);
+                  setIsPopoverOpen(false);
+                }}
+                className="flex flex-row gap-1 items-center cursor-pointer hover:bg-white/5 transition-all duration-200 ease-in-out px-5 py-1.5 rounded-lg"
+              >
+                <div className="text-sm capitalize">
+                  {lang.toLocaleLowerCase()}
+                </div>
+                {lang === "javascript" && <ArrowDown size={14} />}
+              </div>
+            );
+          })}
+        </div>
+      }
+    >
+      <div
+        onClick={() => setIsPopoverOpen((prev) => !prev)}
+        className="flex flex-row gap-1 items-center cursor-pointer hover:bg-white/5 transition-all duration-200 ease-in-out px-1 py-1 my-1 rounded-lg w-max"
       >
-        {Object.values(Language).map((lang, index) => {
-          return (
-            <option value={lang} key={index} className="text-black">
-              {lang.charAt(0).toUpperCase() + lang.slice(1).toLowerCase()}
-            </option>
-          );
-        })}
-      </select>
-    </div>
+        <div className="text-sm capitalize">{language.toLowerCase()}</div>
+        <ChevronDown size={14} />
+      </div>
+    </Popover>
   );
 };

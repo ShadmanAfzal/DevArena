@@ -10,16 +10,16 @@ export const Question = () => {
   if (!problem) return null;
 
   return (
-    <div className="bg-card rounded-2xl ml-4 mb-4 mr-1.5 w-[50%] p-4 flex flex-col gap-2 overflow-y-scroll custom-scrollbar">
+    <div className="bg-card rounded-2xl ml-4 mb-4 mr-1.5 w-[50%] p-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
       <div className="text-xl">{problem.title}</div>
       <div>
         <span
           className={twMerge(
             "capitalize bg-white/5 px-2 py-1 rounded-full text-sm",
             problem.problemDifficulty === ProblemDifficulty.EASY &&
-              "text-teal-500",
+              "text-green-500",
             problem.problemDifficulty === ProblemDifficulty.MEDIUM &&
-              "text-orange-500",
+              "text-yellow-400",
             problem.problemDifficulty === ProblemDifficulty.HARD &&
               "text-red-500"
           )}
