@@ -3,6 +3,7 @@ import {
   ProblemDifficulty,
   useProblemsStore,
 } from "../../../store/problemStore";
+import { CheckCircle2Icon } from "lucide-react";
 
 export const Question = () => {
   const problem = useProblemsStore((state) => state.currentProblem);
@@ -11,7 +12,12 @@ export const Question = () => {
 
   return (
     <div className="bg-card rounded-2xl ml-4 mb-4 mr-1.5 w-[50%] p-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
-      <div className="text-xl">{problem.title}</div>
+      <div className="flex flex-row items-center justify-between">
+        <div className="text-xl">{problem.title}</div>
+        {problem.solved && (
+          <CheckCircle2Icon className="text-green-500" size={18} />
+        )}
+      </div>
       <div>
         <span
           className={twMerge(

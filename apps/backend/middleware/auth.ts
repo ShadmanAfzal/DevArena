@@ -14,7 +14,6 @@ export const authMiddleware = async (
     const token = req.cookies["auth-token"];
 
     if (!token) {
-      req.userId = null;
       return next();
     }
 
@@ -23,9 +22,9 @@ export const authMiddleware = async (
       process.env.JWT_SECRET!
     ) as JwtPayload;
 
-    req.userId = decodedToken.sub ?? null;
+    req.userId = decodedToken.sub;
   } catch (error) {
-    req.userId = null;
+    console.error("Error verifying token:", error);
   }
 
   next();

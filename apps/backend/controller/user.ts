@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import AuthService from "../service/auth.js";
 
-const prismaClient = new PrismaClient();
+const authService = new AuthService(new PrismaClient());
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
@@ -10,11 +11,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
       return;
     }
 
-    const user = await prismaClient.user.findUnique({
-      where: {
-        userId: req.userId,
-      },
-    });
+    const user = await authService.getUserById(req.userId);
 
     if (!user) {
       res.status(404).json({ error: "User not found" });

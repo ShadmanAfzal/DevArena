@@ -1,50 +1,18 @@
 import { Request, Response } from "express";
-import {
-  PrismaClient,
-  Problem,
-  ProblemExample,
-  TestCase,
-} from "@prisma/client";
 import { Language } from "@dev-arena/shared";
-import executeCode from "../service/executeCode.js";
+import executeCode from "../service/codeExecution.js";
 import { ErrorType } from "../types/errorType.js";
+import ProblemService from "../service/problem.js";
+import { PrismaClient } from "@prisma/client/client";
+import CodeExecutionService from "../service/codeExecution.js";
 
-const prisma = new PrismaClient();
-
-type UserSpecificQuestion = Problem & {
-  attempted?: boolean;
-  solved?: boolean;
-};
+const problemService = new ProblemService(new PrismaClient());
 
 export const getAllProblems = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
 
-    const questions: UserSpecificQuestion[] = await prisma.problem.findMany();
-
-    if (userId) {
-      const attemptedProblems = await prisma.attemptedProblem.findMany({
-        where: { userId },
-        select: { problemId: true },
-      });
-
-      const solvedProblems = await prisma.solvedProblem.findMany({
-        where: { userId },
-        select: { problemId: true },
-      });
-
-      questions.map((question) => {
-        if (attemptedProblems.find((q) => q.problemId === question.id)) {
-          question.attempted = true;
-        }
-
-        if (solvedProblems.find((q) => q.problemId === question.id)) {
-          question.solved = true;
-        }
-
-        return question;
-      });
-    }
+    const questions = await problemService.getAllProblems(userId);
 
     res.status(200).json({ data: questions });
   } catch (error) {
@@ -55,51 +23,14 @@ export const getAllProblems = async (req: Request, res: Response) => {
 
 export const getProblemById = async (req: Request, res: Response) => {
   try {
-    const userId = req.userId;
-
-    const { id } = req.params;
-
-    const question = (await prisma.problem.findUnique({
-      where: { id },
-      include: { testCases: true, examples: true },
-    })) as Problem & {
-      testCases: TestCase[];
-      examples: ProblemExample[];
-      attempted?: boolean;
-      solved?: boolean;
-      code?: string;
-    };
+    const question = await problemService.getProblemById(
+      req.params.id,
+      req.userId
+    );
 
     if (!question) {
-      res.status(404).json({ error: "Question not found" });
+      res.status(404).json({ error: "Question not found", data: null });
       return;
-    }
-
-    if (userId) {
-      const attemptedProblems = await prisma.attemptedProblem.findMany({
-        where: { userId },
-        select: { problemId: true, code: true },
-      });
-
-      const solvedProblems = await prisma.solvedProblem.findMany({
-        where: { userId },
-        select: { problemId: true, code: true },
-      });
-
-      const attemptedProblem = attemptedProblems.find(
-        (q) => q.problemId === question.id
-      );
-      const solvedProblem = solvedProblems.find(
-        (q) => q.problemId === question.id
-      );
-
-      if (attemptedProblem) {
-        question.attempted = true;
-        question.code = attemptedProblem.code;
-      } else {
-        question.solved = true;
-        question.code = solvedProblem?.code;
-      }
     }
 
     res.status(200).json({ data: question });
@@ -111,17 +42,18 @@ export const getProblemById = async (req: Request, res: Response) => {
 
 export const getProblemBySlug = async (req: Request, res: Response) => {
   try {
-    const { slug } = req.params;
+    const questionId = await problemService.getProblemIdFromSlug(
+      req.params.slug
+    );
 
-    const question = await prisma.problem.findFirst({
-      where: { slug },
-      include: { testCases: true, examples: true },
-    });
-
-    if (!question) {
-      res.status(404).json({ error: `Question not found with slug ${slug}` });
+    if (!questionId) {
+      res.status(404).json({ error: "Question not found", data: null });
       return;
     }
+    const question = await problemService.getProblemById(
+      questionId,
+      req.userId
+    );
 
     res.status(200).json({ data: question });
   } catch (error) {
@@ -132,14 +64,9 @@ export const getProblemBySlug = async (req: Request, res: Response) => {
 
 export const runProblemTestCases = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const problem = await problemService.getProblemWithTestCases(req.params.id);
 
-    const problem = await prisma.problem.findUnique({
-      where: { id },
-      include: { testCases: true },
-    });
-
-    if (!problem) {
+    if (problem === null) {
       res.status(404).json({
         error: "Problem not found",
         errorType: ErrorType.PROBLEM_NOT_FOUND,
@@ -147,18 +74,14 @@ export const runProblemTestCases = async (req: Request, res: Response) => {
       return;
     }
 
-    const code = req.body.code;
-
-    const language = req.body.language as Language;
-
-    const expression = Buffer.from(code, "base64").toString("utf-8");
-
-    const result = await executeCode(
-      expression,
-      language,
+    const codeExectionService = new CodeExecutionService(
+      Buffer.from(req.body.code, "base64").toString("utf-8"),
+      req.body.language,
       problem.testCases[0],
       problem.functionName
     );
+
+    const result = await codeExectionService.execute();
 
     if (result.errorType) {
       res.status(500).json({

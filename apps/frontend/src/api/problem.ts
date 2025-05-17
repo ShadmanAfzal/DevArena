@@ -30,6 +30,7 @@ export const getProblemBySlug = async (slug: string) => {
       headers: {
         Accept: "application/json",
       },
+      credentials: "include",
     }
   );
 

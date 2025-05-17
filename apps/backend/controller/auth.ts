@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import AuthService from "../service/auth.js";
 
-import authService from "../service/auth.js";
-
-const prisma = new PrismaClient();
+const authService = new AuthService(new PrismaClient());
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
@@ -14,25 +13,9 @@ export const loginUser = async (req: Request, res: Response) => {
       return;
     }
 
-    const user = await prisma.user.upsert({
-      create: {
-        email: userInfo.email,
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        profilePicture: userInfo.profilePicture,
-      },
-      where: {
-        email: userInfo.email,
-      },
-      update: {
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        profilePicture: userInfo.profilePicture,
-        lastActive: new Date(),
-      },
-    });
+    const user = await authService.createOrUpdateUser(userInfo);
 
-    const token = await authService.createToken(user.userId);
+    const token = authService.generateJWT(user.userId);
 
     res.cookie("auth-token", token, {
       httpOnly: true,
