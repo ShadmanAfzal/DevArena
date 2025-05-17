@@ -62,32 +62,35 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
             {problem?.testCases?.at(currentTestCase)?.output}
           </div>
         </div>
-
         {isSubmitted && !isLoading ? (
           error ? (
             <div className="flex flex-col gap-1">
               <div className="text-white/75">Runtime Error:</div>
               <div className="bg-[#f8615c14] py-2 px-3 rounded-lg break-words text-red-500">
-                {error}
+                <pre className="whitespace-pre-wrap break-words overflow-x-auto max-w-full">
+                  {error}
+                </pre>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-1">
+            <>
               {stdOutput.length ? (
-                <>
+                <div className="flex flex-col gap-1">
                   <div className="text-white/75">Stdout:</div>
                   <div className="bg-white/8 py-2 px-3 rounded-lg break-words">
-                    {stdOutput.join("\n")}
+                    <pre className="whitespace-pre-wrap break-words overflow-x-auto max-w-full">
+                      {stdOutput.join("\n")}
+                    </pre>
                   </div>
-                </>
+                </div>
               ) : null}
-              <>
+              <div className="flex flex-col gap-1">
                 <div className="text-white/75">Actual Output:</div>
                 <div className="bg-white/8 py-2 px-3 rounded-lg break-words">
                   {output}
                 </div>
-              </>
-            </div>
+              </div>
+            </>
           )
         ) : null}
       </div>

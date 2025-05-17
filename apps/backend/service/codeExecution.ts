@@ -52,17 +52,28 @@ class CodeExecutionService {
       .replace(/(?<=\S) +/g, " ");
   }
 
+  private cleanError(data: string): string {
+    return data.replace(/\x1B\[[0-9;]*[mK]/g, "").replace(/(?<=\S) +/g, " ");
+  }
+
+  private createTempFile(code: string, fileExtension: string) {
+    const tempFile = path.join(os.tmpdir(), `solution.${fileExtension}`);
+    fs.writeFileSync(tempFile, this.completeCode());
+    return tempFile;
+  }
+
   private getChildProcess() {
-    switch (this.language) {
-      case Language.JAVASCRIPT:
-        return spawn("node", ["-e", this.completeCode()]);
-      case Language.TYPESCRIPT:
-        const tempFile = path.join(os.tmpdir(), `temp-${Date.now()}.ts`);
-        fs.writeFileSync(tempFile, this.completeCode());
-        return spawn("ts-node", [tempFile]);
-      default:
-        throw new Error("Unsupported language");
+    if (this.language === Language.JAVASCRIPT) {
+      const file = this.createTempFile(this.code, "js");
+      return spawn("node", [file]);
     }
+
+    if (this.language === Language.TYPESCRIPT) {
+      const file = this.createTempFile(this.code, "ts");
+      return spawn("ts-node", [file]);
+    }
+
+    throw new Error("Unsupported language");
   }
 
   private extractResult(codeOutputs: string[]) {
@@ -110,7 +121,7 @@ class CodeExecutionService {
         clearTimeout(timer);
         resolve({
           errorType: ErrorType.EXECUTION_ERROR,
-          message: this.cleanup(data),
+          message: this.cleanError(data),
         });
       });
 

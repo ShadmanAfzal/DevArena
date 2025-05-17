@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getAllProblems, getProblemBySlug } from "../api/problem";
+import { useExecutionStore } from "./executionStore";
 
 export enum ProblemDifficulty {
   EASY = "EASY",
@@ -66,6 +67,8 @@ export const useProblemsStore = create<ProblemStoreType>((set) => {
     },
     fetchProblemBySlug: async (slug: string) => {
       set({ isLoading: true, currentProblem: undefined });
+
+      useExecutionStore.getState().resetExecutionState();
 
       const response = await getProblemBySlug(slug);
 

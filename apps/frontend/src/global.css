@@ -24,6 +24,10 @@
     font-family: "InconsolataGo", monospace;
   }
 
+  pre {
+    font-family: "InconsolataGo", monospace;
+  }
+
   .monaco-editor {
     --vscode-focusBorder: var(--color-background) !important;
     background-color: var(var(--color-card)) !important;

@@ -12,6 +12,7 @@ type ExecutionStoreType = {
   isLoading: boolean;
   isSubmitted: boolean;
   execute: (expression: string) => Promise<void>;
+  resetExecutionState: () => void;
 };
 
 export const useExecutionStore = create<ExecutionStoreType>((set) => {
@@ -55,6 +56,16 @@ export const useExecutionStore = create<ExecutionStoreType>((set) => {
         error: undefined,
         errorType: undefined,
         isLoading: false,
+      });
+    },
+    resetExecutionState: () => {
+      set({
+        output: "",
+        error: undefined,
+        errorType: undefined,
+        isLoading: false,
+        isSubmitted: false,
+        stdOutput: [],
       });
     },
   };
