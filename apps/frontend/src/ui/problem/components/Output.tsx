@@ -13,9 +13,8 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
 
   const problem = useProblemsStore((state) => state.currentProblem);
 
-  const { isLoading, error, isSubmitted, result } = useExecutionStore(
-    (state) => state
-  );
+  const { isLoading, error, isSubmitted, output, stdOutput } =
+    useExecutionStore((state) => state);
 
   const handleTestCaseClick = (index: number) => {
     setCurrentTestCase(index);
@@ -63,18 +62,33 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
             {problem?.testCases?.at(currentTestCase)?.output}
           </div>
         </div>
+
         {isSubmitted && !isLoading ? (
-          <div className="flex flex-col gap-1">
-            <div className="text-white/75">Actual Output:</div>
-            <div
-              className={twMerge(
-                "bg-white/8 py-2 px-3 rounded-lg break-words",
-                error && "text-red-500"
-              )}
-            >
-              {error ? error : result.length ? result.join("") : "No output"}
+          error ? (
+            <div className="flex flex-col gap-1">
+              <div className="text-white/75">Runtime Error:</div>
+              <div className="bg-[#f8615c14] py-2 px-3 rounded-lg break-words text-red-500">
+                {error}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-col gap-1">
+              {stdOutput.length ? (
+                <>
+                  <div className="text-white/75">Stdout:</div>
+                  <div className="bg-white/8 py-2 px-3 rounded-lg break-words">
+                    {stdOutput.join("\n")}
+                  </div>
+                </>
+              ) : null}
+              <>
+                <div className="text-white/75">Actual Output:</div>
+                <div className="bg-white/8 py-2 px-3 rounded-lg break-words">
+                  {output}
+                </div>
+              </>
+            </div>
+          )
         ) : null}
       </div>
     </div>

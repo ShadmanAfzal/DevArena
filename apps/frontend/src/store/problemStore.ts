@@ -36,6 +36,8 @@ export type ProblemType = {
   description: string;
   examples: ProblemExample[];
   testCases: ProblemTestCase[];
+  attempted?: boolean;
+  solved?: boolean;
 };
 
 type ProblemStoreType = {

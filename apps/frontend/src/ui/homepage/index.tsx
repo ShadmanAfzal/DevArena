@@ -28,10 +28,12 @@ const Homepage = () => {
               >
                 <div className="flex flex-row items-center gap-4 py-3 px-6">
                   <div>
-                    {index % 2 === 0 ? (
+                    {problem.solved ? (
                       <Check size={13} className="text-green-500" />
-                    ) : (
+                    ) : problem.attempted ? (
                       <Circle size={13} />
+                    ) : (
+                      <Circle size={13} className="opacity-0" />
                     )}
                   </div>
                   <div>

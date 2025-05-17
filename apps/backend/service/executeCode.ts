@@ -1,17 +1,54 @@
 import { spawn } from "child_process";
+import path from "path";
+import os from "os";
+import fs from "fs";
 import { ErrorType } from "../types/errorType.js";
 import { Language } from "@dev-arena/shared";
+import { TestCase } from "@prisma/client/client";
 
-const timeout = 2500;
+const TIMEOUT_MS = 2500;
 
-type ExecutionResult = {
-  data?: string[];
-  message?: string;
-  errorType?: ErrorType;
-} & (
-  | { data: string[]; errorType?: undefined }
-  | { errorType: ErrorType; data?: undefined }
-);
+type ExecutionResult =
+  | {
+      data: {
+        output: string;
+        stdOut: string[];
+      };
+      message?: string;
+      errorType?: undefined;
+    }
+  | {
+      errorType: ErrorType;
+      message?: string;
+      data?: undefined;
+    };
+
+const completeCode = (
+  code: string,
+  testCases: TestCase,
+  functionName: string
+): string => {
+  return `${code}; console.log("code execution result", ${functionName}(${testCases.input}));`;
+};
+
+const extractResult = (codeOutputs: string[]) => {
+  let output = "";
+  let stdOut: string[] = [];
+
+  for (const line of codeOutputs) {
+    if (line.includes("code execution result")) {
+      output = line
+        .split("code execution result")[1]
+        .replace(/'/g, '"')
+        .replace(/\s+/g, "")
+        .trim();
+    } else {
+      stdOut.push(line);
+    }
+  }
+
+  return { output, stdOut };
+};
 
 const cleanup = (data: string): string => {
   return data
@@ -25,7 +62,9 @@ const getChildProcess = (code: string, language: Language) => {
     case Language.JAVASCRIPT:
       return spawn("node", ["-e", code]);
     case Language.TYPESCRIPT:
-      return spawn("ts-node", ["-e", code]);
+      const tempFile = path.join(os.tmpdir(), `temp-${Date.now()}.ts`);
+      fs.writeFileSync(tempFile, code);
+      return spawn("ts-node", [tempFile]);
     default:
       throw new Error("Unsupported language");
   }
@@ -33,12 +72,17 @@ const getChildProcess = (code: string, language: Language) => {
 
 const executeCode = (
   code: string,
-  language: Language
+  language: Language,
+  testCases: TestCase,
+  functionName: string
 ): Promise<ExecutionResult> => {
   return new Promise((resolve, _) => {
     const output: string[] = [];
 
-    const childProcess = getChildProcess(code, language);
+    const childProcess = getChildProcess(
+      completeCode(code, testCases, functionName),
+      language
+    );
 
     const timer = setTimeout(() => {
       childProcess.kill();
@@ -46,20 +90,20 @@ const executeCode = (
         errorType: ErrorType.TIMEOUT,
         message: "Execution timed out",
       });
-    }, timeout);
+    }, TIMEOUT_MS);
 
     childProcess.stdout.setEncoding("utf-8");
     childProcess.stderr.setEncoding("utf-8");
 
     childProcess.stdout.on("data", (data) => {
-      const chunks = data.split("\n");
-      chunks.forEach((chunk: string) => {
-        if (!chunk.trim()) return;
-        output.push(cleanup(chunk));
-      });
+      data
+        .split("\n")
+        .filter((chunk: any) => chunk.trim())
+        .forEach((chunk: string) => output.push(cleanup(chunk)));
     });
 
     childProcess.stderr.on("data", (data) => {
+      clearTimeout(timer);
       resolve({ errorType: ErrorType.EXECUTION_ERROR, message: cleanup(data) });
     });
 
@@ -72,7 +116,14 @@ const executeCode = (
           message: "Process exited with code: " + code,
         });
 
-      resolve({ data: output });
+      const { output: resultOutput, stdOut } = extractResult(output);
+
+      resolve({
+        data: {
+          output: resultOutput,
+          stdOut,
+        },
+      });
     });
   });
 };

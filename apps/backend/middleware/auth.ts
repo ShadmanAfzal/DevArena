@@ -14,8 +14,8 @@ export const authMiddleware = async (
     const token = req.cookies["auth-token"];
 
     if (!token) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+      req.userId = null;
+      return next();
     }
 
     const decodedToken = jwt.verify(
@@ -23,9 +23,10 @@ export const authMiddleware = async (
       process.env.JWT_SECRET!
     ) as JwtPayload;
 
-    req.userId = decodedToken.sub;
-    next();
+    req.userId = decodedToken.sub ?? null;
   } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
+    req.userId = null;
   }
+
+  next();
 };

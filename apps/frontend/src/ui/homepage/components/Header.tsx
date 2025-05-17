@@ -11,6 +11,8 @@ export const Header = () => {
     const user = await loginUser(response.code);
 
     if (user) setUser(user);
+
+    window.location.reload();
   };
 
   const login = useGoogleLogin({

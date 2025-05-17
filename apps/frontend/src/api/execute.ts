@@ -13,21 +13,23 @@ const toBase64 = (str: string) => {
 };
 
 export const executeExpression = async (
-  expression: string,
+  problemId: string,
+  code: string,
   language: Language
 ) => {
-  if (!expression) return;
-
-  const response = await fetch(`${env.VITE_BACKEND_API_ENDPOINT}/execute`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      expression: toBase64(expression),
-      language: language,
-    }),
-  });
+  const response = await fetch(
+    `${env.VITE_BACKEND_API_ENDPOINT}/problem/${problemId}/run`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: toBase64(code),
+        language: language,
+      }),
+    }
+  );
 
   const result = await response.json();
 

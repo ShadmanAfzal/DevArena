@@ -6,6 +6,7 @@ export const getAllProblems = async () => {
     headers: {
       Accept: "application/json",
     },
+    credentials: "include",
   });
 
   const result = await response.json();

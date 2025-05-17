@@ -5,6 +5,11 @@ const prismaClient = new PrismaClient();
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
+    if (!req.userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const user = await prismaClient.user.findUnique({
       where: {
         userId: req.userId,
