@@ -42,15 +42,17 @@ export const Question = () => {
               <div className="flex flex-col gap-2 bg-white/5 p-3 rounded-lg">
                 <div className="flex flex-row gap-2">
                   <div className="font-bold">Input:</div>
-                  <div className="text-white">{example.Input}</div>
+                  <div className="text-white customFont">{example.Input}</div>
                 </div>
                 <div className="flex flex-row gap-2">
                   <div className="font-bold">Output:</div>
-                  <div className="text-white">{example.Output}</div>
+                  <div className="text-white customFont">{example.Output}</div>
                 </div>
                 <div className="flex flex-row gap-2">
                   <div className="font-bold">Explanation:</div>
-                  <div className="text-white">{example.Explanation}</div>
+                  <div className="text-white customFont">
+                    {example.Explanation}
+                  </div>
                 </div>
               </div>
             </div>

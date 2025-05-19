@@ -39,6 +39,7 @@ export type ProblemType = {
   testCases: ProblemTestCase[];
   attempted?: boolean;
   solved?: boolean;
+  userCode?: string;
 };
 
 type ProblemStoreType = {

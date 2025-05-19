@@ -101,10 +101,14 @@ class ProblemService {
       if (attemptedProblem) {
         question.attempted = true;
         question.userCode = attemptedProblem.code;
-      } else {
+      }
+
+      if (solvedProblem) {
         question.solved = true;
         question.userCode = solvedProblem?.code;
       }
+
+      console.log("question", question);
     }
 
     return question;
@@ -123,6 +127,39 @@ class ProblemService {
     }
 
     return question;
+  }
+
+  async markProblemAsSolvedOrAttempted(
+    problemId: string,
+    userId: string,
+    isSolved: boolean,
+    code: string
+  ) {
+    try {
+      const attemptedProblemObj = {
+        code,
+        problemId,
+        userId,
+      };
+
+      if (isSolved) {
+        return await this.prisma.solvedProblem.create({
+          data: {
+            ...attemptedProblemObj,
+            solvedAt: new Date(),
+          },
+        });
+      }
+
+      return await this.prisma.attemptedProblem.create({
+        data: {
+          ...attemptedProblemObj,
+          attemptedAt: new Date(),
+        },
+      });
+    } catch (error) {
+      console.error("Error marking problem as solved or attempted", error);
+    }
   }
 }
 

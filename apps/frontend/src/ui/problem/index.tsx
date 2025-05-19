@@ -46,7 +46,7 @@ const Problem = () => {
             <div className="flex flex-col w-[50%] overflow-hidden">
               <div className="h-[60%] ml-1.5 mb-1.5 mr-4 overflow-hidden">
                 <Editor
-                  value={problem?.initialCode ?? ""}
+                  value={problem?.userCode ?? problem?.initialCode ?? ""}
                   editorRef={editorRef}
                 />
               </div>

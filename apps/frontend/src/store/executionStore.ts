@@ -1,14 +1,12 @@
 import { create } from "zustand";
 import { executeExpression } from "../api/execute";
 import { useEditorStore } from "./editorStore";
-import { Language } from "@dev-arena/shared";
+import { ExecutionResult, Language } from "@dev-arena/shared";
 import { useProblemsStore } from "./problemStore";
 
 type ExecutionStoreType = {
-  output: string;
-  stdOutput: string[];
-  error?: string;
-  errorType?: string;
+  isAllCorrect: boolean;
+  result: ExecutionResult[];
   isLoading: boolean;
   isSubmitted: boolean;
   execute: (expression: string) => Promise<void>;
@@ -17,12 +15,10 @@ type ExecutionStoreType = {
 
 export const useExecutionStore = create<ExecutionStoreType>((set) => {
   return {
-    output: "",
-    error: undefined,
-    errorType: undefined,
+    isAllCorrect: false,
+    result: [],
     isLoading: false,
     isSubmitted: false,
-    stdOutput: [],
     execute: async (expression: string) => {
       set({ isLoading: true });
 
@@ -38,34 +34,17 @@ export const useExecutionStore = create<ExecutionStoreType>((set) => {
         language
       );
 
-      if (executionResponse?.errorType) {
-        return set({
-          isSubmitted: true,
-          error: executionResponse.error,
-          errorType: executionResponse.errorType,
-          isLoading: false,
-          output: undefined,
-          stdOutput: [],
-        });
-      }
-
-      return set({
-        isSubmitted: true,
-        output: executionResponse?.data?.output ?? "No output",
-        stdOutput: executionResponse?.data?.stdOut ?? [],
-        error: undefined,
-        errorType: undefined,
+      set({
+        isAllCorrect: executionResponse.isAllCorrect,
+        result: executionResponse.result,
         isLoading: false,
+        isSubmitted: true,
       });
     },
     resetExecutionState: () => {
       set({
-        output: "",
-        error: undefined,
-        errorType: undefined,
         isLoading: false,
         isSubmitted: false,
-        stdOutput: [],
       });
     },
   };

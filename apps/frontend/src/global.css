@@ -20,7 +20,11 @@
 
 @layer base {
   body {
-    @apply bg-background text-foreground text-[15px];
+    @apply bg-background text-foreground font-sans text-[14px];
+  }
+
+  .customFont {
+    font-size: 15px;
     font-family: "InconsolataGo", monospace;
   }
 

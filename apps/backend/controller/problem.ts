@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import { Language } from "@dev-arena/shared";
-import executeCode from "../service/codeExecution.js";
 import { ErrorType } from "../types/errorType.js";
 import ProblemService from "../service/problem.js";
 import { PrismaClient } from "@prisma/client/client";
 import CodeExecutionService from "../service/codeExecution.js";
+import { ExecutionResult } from "@dev-arena/shared";
 
 const problemService = new ProblemService(new PrismaClient());
 
@@ -74,30 +73,53 @@ export const runProblemTestCases = async (req: Request, res: Response) => {
       return;
     }
 
-    const codeExectionService = new CodeExecutionService(
-      Buffer.from(req.body.code, "base64").toString("utf-8"),
-      req.body.language,
-      problem.testCases[0],
-      problem.functionName
-    );
+    const finalResult: ExecutionResult[] = [];
 
-    const result = await codeExectionService.execute();
+    for (const testCase of problem.testCases) {
+      const codeExectionService = new CodeExecutionService(
+        Buffer.from(req.body.code, "base64").toString("utf-8"),
+        req.body.language,
+        testCase,
+        problem.functionName
+      );
 
-    if (result.errorType) {
-      res.status(500).json({
-        error: result.message,
-        errorType: result.errorType,
+      const result = await codeExectionService.execute();
+
+      if (result.errorType) {
+        finalResult.push({
+          input: testCase.input,
+          output: testCase.output,
+          isCorrect: false,
+          error: result.message,
+          errorType: result.errorType,
+        });
+
+        continue;
+      }
+
+      finalResult.push({
+        input: testCase.input,
+        output: testCase.output,
+        userOutput: result.data.output,
+        isCorrect: result.data.output === testCase.output,
+        stdOut: result.data.stdOut,
       });
-      return;
     }
 
-    res.json({
-      data: {
-        output: result.data.output,
-        stdOut: result.data.stdOut,
-        isCorrect: result.data.output === problem.testCases[0].output,
-      },
-    });
+    const isAllCorrect = finalResult.every(
+      (result) => result.isCorrect === true
+    );
+
+    if (req.userId) {
+      await problemService.markProblemAsSolvedOrAttempted(
+        req.params.id,
+        req.userId,
+        isAllCorrect,
+        Buffer.from(req.body.code, "base64").toString("utf-8")
+      );
+    }
+
+    res.json({ isAllCorrect, result: finalResult });
   } catch (error) {
     console.error("Error executing expression:", error);
     res.status(500).json({

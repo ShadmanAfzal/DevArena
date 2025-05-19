@@ -1,4 +1,4 @@
-import { Language } from "@dev-arena/shared";
+import { ExecutionResult, Language } from "@dev-arena/shared";
 
 const env = import.meta.env;
 
@@ -24,6 +24,7 @@ export const executeExpression = async (
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         code: toBase64(code),
         language: language,
@@ -33,14 +34,8 @@ export const executeExpression = async (
 
   const result = await response.json();
 
-  if (!response.ok) {
-    return {
-      error: result.error,
-      errorType: result.errorType,
-    };
-  }
-
   return {
-    data: result.data,
+    isAllCorrect: result.isAllCorrect,
+    result: result.result as ExecutionResult[],
   };
 };

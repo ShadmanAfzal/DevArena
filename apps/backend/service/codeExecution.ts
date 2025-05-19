@@ -28,6 +28,13 @@ class CodeExecutionService {
   private language: Language;
   private testCases: TestCase;
   private functionName: string;
+  private extensionLookup: Record<Language, string> = {
+    [Language.JAVASCRIPT]: "js",
+    [Language.TYPESCRIPT]: "ts",
+    [Language.CPP]: "cpp",
+    [Language.JAVA]: "java",
+    [Language.PYTHON]: "py",
+  };
 
   constructor(
     code: string,
@@ -42,7 +49,14 @@ class CodeExecutionService {
   }
 
   private completeCode(): string {
-    return `${this.code}; console.log("code execution result", ${this.functionName}(${this.testCases.input}));`;
+    if (
+      this.language === Language.JAVASCRIPT ||
+      this.language === Language.TYPESCRIPT
+    ) {
+      return `${this.code}; console.log("code execution result", ${this.functionName}(${this.testCases.input}));`;
+    }
+
+    throw new Error("Unsupported language");
   }
 
   private cleanup(data: string): string {
@@ -56,20 +70,23 @@ class CodeExecutionService {
     return data.replace(/\x1B\[[0-9;]*[mK]/g, "").replace(/(?<=\S) +/g, " ");
   }
 
-  private createTempFile(code: string, fileExtension: string) {
-    const tempFile = path.join(os.tmpdir(), `solution.${fileExtension}`);
+  private createTempFile() {
+    const tempFile = path.join(
+      os.tmpdir(),
+      `solution.${this.extensionLookup[this.language]}`
+    );
     fs.writeFileSync(tempFile, this.completeCode());
     return tempFile;
   }
 
   private getChildProcess() {
+    const file = this.createTempFile();
+
     if (this.language === Language.JAVASCRIPT) {
-      const file = this.createTempFile(this.code, "js");
       return spawn("node", [file]);
     }
 
     if (this.language === Language.TYPESCRIPT) {
-      const file = this.createTempFile(this.code, "ts");
       return spawn("ts-node", [file]);
     }
 
