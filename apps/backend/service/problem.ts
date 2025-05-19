@@ -1,3 +1,4 @@
+import { Language, UserSubmission } from "@dev-arena/shared";
 import {
   PrismaClient,
   Problem,
@@ -5,17 +6,13 @@ import {
   TestCase,
 } from "@prisma/client/client";
 
-type UserSpecificQuestion = Problem & {
-  attempted?: boolean;
-  solved?: boolean;
-};
+type ProblemWithUserSubmission = Problem &
+  Omit<UserSubmission, "codeSubmission" | "language">;
 
-type UserSpecificQuestionWithTestCases = Problem & {
+type UserSubmissionWithTestCases = Problem & {
   testCases: TestCase[];
   examples: ProblemExample[];
-  attempted?: boolean;
-  solved?: boolean;
-  userCode?: string;
+  userSubmission?: UserSubmission;
 };
 
 class ProblemService {
@@ -25,8 +22,8 @@ class ProblemService {
     this.prisma = prisma;
   }
 
-  async getAllProblems(userId?: string): Promise<UserSpecificQuestion[]> {
-    const questions: UserSpecificQuestion[] =
+  async getAllProblems(userId?: string): Promise<ProblemWithUserSubmission[]> {
+    const questions: ProblemWithUserSubmission[] =
       await this.prisma.problem.findMany();
 
     if (userId) {
@@ -69,8 +66,8 @@ class ProblemService {
   async getProblemById(
     problemId: string,
     userId?: string
-  ): Promise<UserSpecificQuestionWithTestCases | null> {
-    const question: UserSpecificQuestionWithTestCases | null =
+  ): Promise<UserSubmissionWithTestCases | null> {
+    const question: UserSubmissionWithTestCases | null =
       await this.prisma.problem.findUnique({
         where: { id: problemId },
         include: { testCases: true, examples: true },
@@ -83,12 +80,12 @@ class ProblemService {
     if (userId) {
       const attemptedProblems = await this.prisma.attemptedProblem.findMany({
         where: { userId },
-        select: { problemId: true, code: true },
+        select: { problemId: true, code: true, language: true },
       });
 
       const solvedProblems = await this.prisma.solvedProblem.findMany({
         where: { userId },
-        select: { problemId: true, code: true },
+        select: { problemId: true, code: true, language: true },
       });
 
       const attemptedProblem = attemptedProblems.find(
@@ -99,16 +96,22 @@ class ProblemService {
       );
 
       if (attemptedProblem) {
-        question.attempted = true;
-        question.userCode = attemptedProblem.code;
+        question.userSubmission = {
+          codeSubmission: attemptedProblem?.code,
+          attempted: true,
+          solved: false,
+          language: attemptedProblem?.language,
+        };
       }
 
       if (solvedProblem) {
-        question.solved = true;
-        question.userCode = solvedProblem?.code;
+        question.userSubmission = {
+          codeSubmission: solvedProblem?.code,
+          attempted: false,
+          solved: true,
+          language: solvedProblem?.language,
+        };
       }
-
-      console.log("question", question);
     }
 
     return question;
@@ -133,26 +136,48 @@ class ProblemService {
     problemId: string,
     userId: string,
     isSolved: boolean,
-    code: string
+    code: string,
+    language: Language
   ) {
     try {
       const attemptedProblemObj = {
         code,
         problemId,
         userId,
+        language,
       };
 
       if (isSolved) {
-        return await this.prisma.solvedProblem.create({
-          data: {
+        return await this.prisma.solvedProblem.upsert({
+          where: {
+            userId_problemId: {
+              problemId: problemId,
+              userId: userId,
+            },
+          },
+          update: {
+            ...attemptedProblemObj,
+            solvedAt: new Date(),
+          },
+          create: {
             ...attemptedProblemObj,
             solvedAt: new Date(),
           },
         });
       }
 
-      return await this.prisma.attemptedProblem.create({
-        data: {
+      return await this.prisma.attemptedProblem.upsert({
+        where: {
+          userId_problemId: {
+            problemId: problemId,
+            userId: userId,
+          },
+        },
+        update: {
+          ...attemptedProblemObj,
+          attemptedAt: new Date(),
+        },
+        create: {
           ...attemptedProblemObj,
           attemptedAt: new Date(),
         },

@@ -22,17 +22,21 @@ export const useExecutionStore = create<ExecutionStoreType>((set) => {
     execute: async (expression: string) => {
       set({ isLoading: true });
 
-      const currentProblem = useProblemsStore.getState().currentProblem;
+      const problemStore = useProblemsStore.getState();
 
-      if (!currentProblem) return;
+      if (!problemStore.currentProblem) return;
 
       const language = useEditorStore.getState().language as Language;
 
       const executionResponse = await executeExpression(
-        currentProblem.id,
+        problemStore.currentProblem.id,
         expression,
         language
       );
+
+      if (executionResponse.isAllCorrect) {
+        problemStore.markProblemAsSolved();
+      }
 
       set({
         isAllCorrect: executionResponse.isAllCorrect,

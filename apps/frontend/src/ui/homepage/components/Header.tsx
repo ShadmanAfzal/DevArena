@@ -22,11 +22,10 @@ export const Header = () => {
   });
 
   return (
-    <div className="flex flex-row gap-4 justify-between py-4 mx-8">
+    <div className="flex flex-row gap-4 justify-between py-4 mx-6">
       <div className="text-3xl font-bold">
         <Link to="/" className="flex flex-row">
-          <div className="">arena</div>
-          <div className="text-yellow-500">.dev</div>
+          <div className="text-[#edeae4] select-none">arena.dev</div>
         </Link>
       </div>
       {!isLoggedIn ? (

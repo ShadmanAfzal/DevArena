@@ -1,3 +1,5 @@
+import { ProblemType } from "../store/problemStore";
+
 const env = import.meta.env;
 
 export const getAllProblems = async () => {
@@ -43,6 +45,6 @@ export const getProblemBySlug = async (slug: string) => {
   }
 
   return {
-    data: result.data,
+    data: result.data as ProblemType,
   };
 };

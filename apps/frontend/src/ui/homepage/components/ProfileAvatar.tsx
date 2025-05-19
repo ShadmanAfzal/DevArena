@@ -22,7 +22,7 @@ const ProfileAvatar = () => {
     >
       <img
         src={user.profilePicture}
-        className="h-8 aspect-square rounded-full cursor-pointer transition-all duration-200 ease-in-out hover:ring-4 hover:ring-white/10"
+        className="h-8 aspect-square rounded-full cursor-pointer transition-all duration-200 ease-in-out hover:ring-4 hover:ring-white/10 select-none"
         crossOrigin="anonymous"
         onClick={togglePopover}
         referrerPolicy="no-referrer"

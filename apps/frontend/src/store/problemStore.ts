@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { getAllProblems, getProblemBySlug } from "../api/problem";
 import { useExecutionStore } from "./executionStore";
+import { Language, UserSubmission } from "@dev-arena/shared";
+import { useEditorStore } from "./editorStore";
 
 export enum ProblemDifficulty {
   EASY = "EASY",
@@ -37,9 +39,7 @@ export type ProblemType = {
   description: string;
   examples: ProblemExample[];
   testCases: ProblemTestCase[];
-  attempted?: boolean;
-  solved?: boolean;
-  userCode?: string;
+  userSubmission?: UserSubmission;
 };
 
 type ProblemStoreType = {
@@ -49,6 +49,7 @@ type ProblemStoreType = {
   currentProblem?: ProblemType;
   fetchProblemBySlug: (slug: string) => void;
   fetchProblems: () => void;
+  markProblemAsSolved: () => void;
 };
 
 export const useProblemsStore = create<ProblemStoreType>((set) => {
@@ -73,11 +74,40 @@ export const useProblemsStore = create<ProblemStoreType>((set) => {
 
       const response = await getProblemBySlug(slug);
 
+      const editorStore = useEditorStore.getState();
+
       if (response.error) {
         return set({ error: response.error, isLoading: false });
       }
 
+      if (response?.data?.userSubmission) {
+        editorStore.setInitialCode(response.data.userSubmission.codeSubmission);
+        editorStore.changeLanguage(
+          response.data.userSubmission.language as Language
+        );
+      } else {
+        editorStore.setInitialCode(
+          response.data?.initialCode ?? 'console.log("Hello World")'
+        );
+      }
+
       return set({ currentProblem: response.data, isLoading: false });
     },
+    markProblemAsSolved: async () =>
+      set((prev) => {
+        if (!prev.currentProblem) return prev;
+
+        if (!prev.currentProblem.userSubmission) return prev;
+
+        return {
+          currentProblem: {
+            ...prev.currentProblem,
+            userSubmission: {
+              ...prev.currentProblem.userSubmission,
+              isSolved: true,
+            },
+          },
+        };
+      }),
   };
 });

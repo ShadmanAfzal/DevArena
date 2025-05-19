@@ -32,6 +32,7 @@ model SolvedProblem {
   problem   Problem  @relation(fields: [problemId], references: [id])
   problemId String
   solvedAt  DateTime @default(now())
+  language  String   @default("javascript")
   code      String
 
   @@unique([userId, problemId])
@@ -43,6 +44,7 @@ model AttemptedProblem {
   userId      String
   problem     Problem  @relation(fields: [problemId], references: [id])
   problemId   String
+  language    String   @default("javascript")
   attemptedAt DateTime @default(now())
   code        String
 

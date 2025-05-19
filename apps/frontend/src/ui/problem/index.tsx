@@ -7,6 +7,7 @@ import { Editor } from "./components/Editor";
 import { useParams } from "react-router";
 import { useProblemsStore } from "../../store/problemStore";
 import { LoaderCircle } from "lucide-react";
+import { useEditorStore } from "../../store/editorStore";
 
 const Problem = () => {
   const { slug } = useParams();
@@ -15,12 +16,9 @@ const Problem = () => {
 
   const executeExpression = useExecutionStore((state) => state.execute);
 
-  const fetchProblemBySlug = useProblemsStore(
-    (state) => state.fetchProblemBySlug
-  );
-  const { currentProblem: problem, isLoading } = useProblemsStore(
-    (state) => state
-  );
+  const { isLoading, fetchProblemBySlug } = useProblemsStore((state) => state);
+
+  const { initialCode } = useEditorStore((state) => state);
 
   useEffect(() => {
     if (slug) fetchProblemBySlug(slug);
@@ -45,10 +43,7 @@ const Problem = () => {
             <Question />
             <div className="flex flex-col w-[50%] overflow-hidden">
               <div className="h-[60%] ml-1.5 mb-1.5 mr-4 overflow-hidden">
-                <Editor
-                  value={problem?.userCode ?? problem?.initialCode ?? ""}
-                  editorRef={editorRef}
-                />
+                <Editor value={initialCode} editorRef={editorRef} />
               </div>
               <Output handleSubmit={handleSubmit} />
             </div>

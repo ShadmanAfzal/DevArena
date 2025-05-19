@@ -115,7 +115,8 @@ export const runProblemTestCases = async (req: Request, res: Response) => {
         req.params.id,
         req.userId,
         isAllCorrect,
-        Buffer.from(req.body.code, "base64").toString("utf-8")
+        Buffer.from(req.body.code, "base64").toString("utf-8"),
+        req.body.language
       );
     }
 
