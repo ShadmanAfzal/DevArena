@@ -1,8 +1,9 @@
 import { DotIcon, LoaderCircle } from "lucide-react";
-import { useExecutionStore } from "../../../store/executionStore";
-import { useProblemsStore } from "../../../store/problemStore";
+import { useExecutionStore } from "../../../../store/executionStore";
+import { useProblemsStore } from "../../../../store/problemStore";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
+import OutputRow from "./row";
 
 type OutputPropsType = {
   handleSubmit: () => void;
@@ -13,9 +14,8 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
 
   const problem = useProblemsStore((state) => state.currentProblem);
 
-  const { isLoading, isSubmitted, result, isAllCorrect } = useExecutionStore(
-    (state) => state
-  );
+  const { isLoading, isSubmitted, result, isAllCorrect, error } =
+    useExecutionStore((state) => state);
 
   const handleTestCaseClick = (index: number) => {
     setCurrentTestCase(index);
@@ -50,7 +50,7 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
                     <DotIcon
                       size={30}
                       className={twMerge(
-                        result[index].isCorrect
+                        result[index]?.isCorrect
                           ? "text-green-500"
                           : "text-red-500"
                       )}
@@ -77,46 +77,43 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
         </div>
       </div>
       <div className="flex flex-col gap-4 my-4">
-        <div className="flex flex-col gap-1">
-          <div className="text-white/75">Input:</div>
-          <div className="bg-white/8 py-2 px-3 rounded-lg customFont">
-            {problem?.testCases?.at(currentTestCase)?.input}
-          </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="text-white/75">Expected Output:</div>
-          <div className="bg-white/8 py-2 px-3 rounded-lg customFont">
-            {problem?.testCases?.at(currentTestCase)?.output}
-          </div>
-        </div>
+        <OutputRow
+          label="Input"
+          data={problem?.testCases?.at(currentTestCase)?.input ?? ""}
+        />
+        <OutputRow
+          label="Expected Output"
+          data={problem?.testCases?.at(currentTestCase)?.output ?? ""}
+        />
         {isSubmitted && !isLoading ? (
-          result[currentTestCase].error ? (
-            <div className="flex flex-col gap-1">
-              <div className="text-white/75">Runtime Error:</div>
-              <div className="bg-[#f8615c14] py-2 px-3 rounded-lg break-words text-red-500">
-                <pre className="whitespace-pre-wrap break-words overflow-x-auto max-w-full">
-                  {result[currentTestCase].error}
-                </pre>
-              </div>
-            </div>
+          error ? (
+            <OutputRow
+              label="Runtime Error"
+              data={error?.message}
+              isError
+              preserveIndentation
+            />
+          ) : result[currentTestCase].error ? (
+            <OutputRow
+              label="Runtime Error"
+              data={result[currentTestCase].error}
+              isError
+              preserveIndentation
+            />
           ) : (
             <>
               {result[currentTestCase].stdOut?.length ? (
-                <div className="flex flex-col gap-1">
-                  <div className="text-white/75">Stdout:</div>
-                  <div className="bg-white/8 py-2 px-3 rounded-lg customFont break-words">
-                    <pre className="whitespace-pre-wrap break-words overflow-x-auto max-w-full">
-                      {result[currentTestCase].stdOut?.join("\n")}
-                    </pre>
-                  </div>
-                </div>
+                <OutputRow
+                  label="Stdout"
+                  data={result[currentTestCase].stdOut?.join("\n")}
+                  preserveIndentation
+                />
               ) : null}
-              <div className="flex flex-col gap-1">
-                <div className="text-white/75">Actual Output:</div>
-                <div className="bg-white/8 py-2 px-3 rounded-lg customFont break-words">
-                  {result[currentTestCase].userOutput}
-                </div>
-              </div>
+              <OutputRow
+                preserveIndentation
+                label="Actual Output"
+                data={result[currentTestCase].userOutput ?? "No output"}
+              />
             </>
           )
         ) : null}

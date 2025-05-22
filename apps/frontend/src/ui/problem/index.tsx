@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as monaco from "monaco-editor";
 import { useExecutionStore } from "../../store/executionStore";
 import { Question } from "./components/Question";
-import Output from "./components/Output";
+import Output from "./components/output";
 import { Editor } from "./components/Editor";
 import { useParams } from "react-router";
 import { useProblemsStore } from "../../store/problemStore";

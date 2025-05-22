@@ -34,8 +34,19 @@ export const executeExpression = async (
 
   const result = await response.json();
 
+  if (!response.ok) {
+    return {
+      error: {
+        message: result.error,
+        errorType: result.errorType,
+      },
+    };
+  }
+
   return {
-    isAllCorrect: result.isAllCorrect,
-    result: result.result as ExecutionResult[],
+    data: {
+      isAllCorrect: result.isAllCorrect,
+      result: result.result as ExecutionResult[],
+    },
   };
 };

@@ -23,7 +23,7 @@ function App() {
   }, [setUser]);
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col custom-scrollbar">
       <GoogleOAuthProvider clientId={env.VITE_CLIENT_ID}>
         <BrowserRouter>
           <Header />

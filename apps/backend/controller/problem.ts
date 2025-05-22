@@ -124,7 +124,7 @@ export const runProblemTestCases = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error executing expression:", error);
     res.status(500).json({
-      error: "Invalid expression",
+      error: "Invalid code",
       errorType: ErrorType.EXECUTION_ERROR,
     });
   }

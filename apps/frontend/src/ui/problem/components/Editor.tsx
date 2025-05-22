@@ -4,8 +4,6 @@ import { useEditorStore } from "../../../store/editorStore";
 import { Braces, CodeXml } from "lucide-react";
 import { LanguageSelector } from "./LanguageSelector";
 
-import theme from "./theme.json";
-
 type EditorProps = {
   value: string;
   editorRef: React.RefObject<monaco.editor.IStandaloneCodeEditor | null>;
@@ -22,7 +20,7 @@ export const Editor = ({ value, editorRef }: EditorProps) => {
     monaco.editor.defineTheme("customTheme", {
       base: "vs-dark",
       inherit: true,
-      rules: theme.rules,
+      rules: [],
       colors: {
         "editor.background": "#282828",
       },
@@ -37,8 +35,8 @@ export const Editor = ({ value, editorRef }: EditorProps) => {
     <div className="w-full h-full flex flex-col rounded-2xl overflow-hidden">
       <div className="bg-white/5">
         <div className="flex flex-row gap-2 items-center p-2">
-          <CodeXml className="text-green-500" />
-          <div className="text-lg select-none">Code</div>
+          <CodeXml className="text-green-500" size={22} />
+          <div className="text select-none">Code</div>
         </div>
         <div className="flex flex-row justify-between items-center bg-card border-b border-white/10 px-2">
           <LanguageSelector />

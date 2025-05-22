@@ -7,6 +7,10 @@ import { useProblemsStore } from "./problemStore";
 type ExecutionStoreType = {
   isAllCorrect: boolean;
   result: ExecutionResult[];
+  error?: {
+    message: string;
+    errorType: string;
+  };
   isLoading: boolean;
   isSubmitted: boolean;
   execute: (expression: string) => Promise<void>;
@@ -34,19 +38,35 @@ export const useExecutionStore = create<ExecutionStoreType>((set) => {
         language
       );
 
-      if (executionResponse.isAllCorrect) {
+      if (executionResponse.error) {
+        set({
+          isAllCorrect: false,
+          isLoading: false,
+          isSubmitted: true,
+          result: [],
+          error: executionResponse.error,
+        });
+
+        return;
+      }
+
+      if (executionResponse.data?.isAllCorrect) {
         problemStore.markProblemAsSolved();
       }
 
       set({
-        isAllCorrect: executionResponse.isAllCorrect,
-        result: executionResponse.result,
+        error: undefined,
+        isAllCorrect: executionResponse.data?.isAllCorrect ?? false,
+        result: executionResponse.data?.result ?? [],
         isLoading: false,
         isSubmitted: true,
       });
     },
     resetExecutionState: () => {
       set({
+        error: undefined,
+        isAllCorrect: false,
+        result: undefined,
         isLoading: false,
         isSubmitted: false,
       });
