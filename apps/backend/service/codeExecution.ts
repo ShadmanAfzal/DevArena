@@ -53,7 +53,25 @@ class CodeExecutionService {
       this.language === Language.JAVASCRIPT ||
       this.language === Language.TYPESCRIPT
     ) {
-      return `${this.code}; console.log("code execution result", ${this.functionName}(${this.testCases.input}));`;
+      return `${this.code}; console.log("code execution result", ${this.functionName}(${this.testCases.input}));`.trim();
+    }
+
+    if (this.language === Language.CPP) {
+      return `
+      #include <iostream>
+      #include <string>
+      using namespace std; 
+      
+      ${this.code}
+
+      int main() {
+        auto result = ${this.functionName}(${this.testCases.input});
+
+        cout << "code execution result " << result;
+
+        return 0;
+      }
+      `.trim();
     }
 
     throw new Error("Unsupported language");
@@ -98,6 +116,16 @@ class CodeExecutionService {
 
     if (this.language === Language.TYPESCRIPT) {
       return spawn("docker", [...baseArgs, "tsx", containerPath]);
+    }
+
+    if (this.language === Language.CPP) {
+      const executableName = fileName.replace(".cpp", "");
+      return spawn("docker", [
+        ...baseArgs,
+        "bash",
+        "-c",
+        `g++ ${containerPath} -o /workspace/${executableName} && /workspace/${executableName}`,
+      ]);
     }
 
     throw new Error("Unsupported language");
