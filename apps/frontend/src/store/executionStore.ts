@@ -24,7 +24,12 @@ export const useExecutionStore = create<ExecutionStoreType>((set) => {
     isLoading: false,
     isSubmitted: false,
     execute: async (expression: string) => {
-      set({ isLoading: true });
+      set({
+        isLoading: true,
+        result: [],
+        isSubmitted: false,
+        error: undefined,
+      });
 
       const problemStore = useProblemsStore.getState();
 

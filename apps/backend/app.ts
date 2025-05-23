@@ -3,7 +3,6 @@ import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
-import executeRouter from "./router/execute.js";
 import problemRouter from "./router/problem.js";
 import authRouter from "./router/auth.js";
 import userRouter from "./router/user.js";
@@ -24,7 +23,6 @@ app.get("/", (req, res) => {
   res.send({ message: "ok" });
 });
 
-app.use("/api/execute", executeRouter);
 app.use("/api/problem", problemRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);

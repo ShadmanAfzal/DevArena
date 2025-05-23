@@ -81,13 +81,23 @@ class CodeExecutionService {
 
   private getChildProcess() {
     const file = this.createTempFile();
+    const fileName = path.basename(file);
+    const containerPath = `/workspace/${fileName}`;
+
+    const baseArgs = [
+      "run",
+      "--rm",
+      "-v",
+      `${file}:${containerPath}`,
+      "dev-arena-executor",
+    ];
 
     if (this.language === Language.JAVASCRIPT) {
-      return spawn("node", [file]);
+      return spawn("docker", [...baseArgs, "node", containerPath]);
     }
 
     if (this.language === Language.TYPESCRIPT) {
-      return spawn("ts-node", [file]);
+      return spawn("docker", [...baseArgs, "tsx", containerPath]);
     }
 
     throw new Error("Unsupported language");
