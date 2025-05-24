@@ -10,9 +10,7 @@ RUN apt-get update && \
     build-essential \
     python3 \
     python3-pip \
-    openjdk-17-jdk \
     git \
-    g++ \
     ca-certificates \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -27,8 +25,5 @@ RUN npm install -g tsx
 SHELL ["/bin/bash", "-c"]
 
 WORKDIR /workspace
-
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-ENV PATH="$JAVA_HOME/bin:$PATH"
 
 CMD [ "bash" ]

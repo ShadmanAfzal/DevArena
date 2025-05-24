@@ -2,9 +2,17 @@ import { spawn } from "child_process";
 import path from "path";
 import os from "os";
 import fs from "fs";
+import Mustache from "mustache";
+
 import { ErrorType } from "../types/errorType.js";
 import { Language } from "@dev-arena/shared";
-import { TestCase } from "@prisma/client/client";
+import { TestCase } from "@prisma/client";
+
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const TIMEOUT_MS = 2500;
 
@@ -28,11 +36,10 @@ class CodeExecutionService {
   private language: Language;
   private testCases: TestCase;
   private functionName: string;
+  private uuid: string = crypto.randomUUID();
   private extensionLookup: Record<Language, string> = {
     [Language.JAVASCRIPT]: "js",
     [Language.TYPESCRIPT]: "ts",
-    [Language.CPP]: "cpp",
-    [Language.JAVA]: "java",
     [Language.PYTHON]: "py",
   };
 
@@ -48,33 +55,31 @@ class CodeExecutionService {
     this.functionName = functionName;
   }
 
+  private getTemplatePath(): string {
+    switch (this.language) {
+      case Language.JAVASCRIPT:
+      case Language.TYPESCRIPT:
+        return path.join(__dirname, "../../templates/node.mustache");
+
+      case Language.PYTHON:
+        return path.join(__dirname, "../../templates/python.mustache");
+
+      default:
+        throw new Error(`Unsupported language: ${this.language}`);
+    }
+  }
+
   private completeCode(): string {
-    if (
-      this.language === Language.JAVASCRIPT ||
-      this.language === Language.TYPESCRIPT
-    ) {
-      return `${this.code}; console.log("code execution result", ${this.functionName}(${this.testCases.input}));`.trim();
-    }
+    const templatePath = this.getTemplatePath();
 
-    if (this.language === Language.CPP) {
-      return `
-      #include <iostream>
-      #include <string>
-      using namespace std; 
-      
-      ${this.code}
+    const template = fs.readFileSync(templatePath, "utf-8");
 
-      int main() {
-        auto result = ${this.functionName}(${this.testCases.input});
-
-        cout << "code execution result " << result;
-
-        return 0;
-      }
-      `.trim();
-    }
-
-    throw new Error("Unsupported language");
+    return Mustache.render(template, {
+      code: this.code,
+      functionName: this.functionName,
+      input: this.testCases.input,
+      uuid: this.uuid,
+    }).trim();
   }
 
   private cleanup(data: string): string {
@@ -118,14 +123,8 @@ class CodeExecutionService {
       return spawn("docker", [...baseArgs, "tsx", containerPath]);
     }
 
-    if (this.language === Language.CPP) {
-      const executableName = fileName.replace(".cpp", "");
-      return spawn("docker", [
-        ...baseArgs,
-        "bash",
-        "-c",
-        `g++ ${containerPath} -o /workspace/${executableName} && /workspace/${executableName}`,
-      ]);
+    if (this.language === Language.PYTHON) {
+      return spawn("docker", [...baseArgs, "python3", containerPath]);
     }
 
     throw new Error("Unsupported language");
@@ -135,9 +134,9 @@ class CodeExecutionService {
     let output = "";
     let stdOut: string[] = [];
     for (const line of codeOutputs) {
-      if (line.includes("code execution result")) {
+      if (line.includes(this.uuid)) {
         output = line
-          .split("code execution result")[1]
+          .split(this.uuid)[1]
           .replace(/'/g, '"')
           .replace(/\s+/g, "")
           .trim();
