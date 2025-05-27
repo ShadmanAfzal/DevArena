@@ -13,7 +13,7 @@ export const Question = () => {
   return (
     <div className="bg-card rounded-2xl ml-4 mb-4 mr-1.5 w-[50%] p-4 flex flex-col gap-2 overflow-y-auto custom-scrollbar">
       <div className="flex flex-row items-center justify-between">
-        <div className="text-xl">{problem.title}</div>
+        <div className="text-xl font-bold">{problem.title}</div>
         {problem.userSubmission?.solved && (
           <div className="flex flex-row gap-1 items-center">
             <span className="text-white/75">Solved</span>
