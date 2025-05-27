@@ -13,25 +13,34 @@ const Homepage = () => {
   }, [fetchProblems]);
 
   return (
-    <div className="overflow-x-auto px-4 py-1">
-      <div className="min-w-full rounded-lg">
+    <div className="px-4 py-2">
+      <div className="min-w-full rounded-lg mb-10">
         {problems.map((problem, index) => {
           return (
-            <Link to={`/problem/${problem.slug}`}>
+            <Link to={`/problem/${problem.slug}`} key={problem.slug}>
               <div
                 key={index}
                 className={twMerge(
                   "grid",
                   index % 2 === 0 ? "rounded-md bg-card" : ""
                 )}
-                style={{ gridTemplateColumns: "50% 20% 1fr" }}
+                style={{ gridTemplateColumns: "25% 45% 10% 20%" }}
               >
                 <div className="flex flex-row items-center gap-4 py-3 px-6">
                   <div>
-                    {problem.solved ? (
-                      <Check size={13} className="text-green-500" />
-                    ) : problem.attempted ? (
-                      <Circle size={13} />
+                    {problem.userSubmission?.solved ? (
+                      <Check
+                        size={13}
+                        className="text-green-500"
+                        data-tooltip-id="main"
+                        data-tooltip-content="Submitted"
+                      />
+                    ) : problem.userSubmission?.attempted ? (
+                      <Circle
+                        size={13}
+                        data-tooltip-id="main"
+                        data-tooltip-content="Attempted"
+                      />
                     ) : (
                       <Circle size={13} className="opacity-0" />
                     )}
@@ -39,6 +48,9 @@ const Homepage = () => {
                   <div>
                     {index + 1}. {problem.title}
                   </div>
+                </div>
+                <div className="truncate overflow-hidden whitespace-nowrap py-3 px-6 w-full text-white/75">
+                  {problem.description.replace(/\n/, "")}
                 </div>
                 <div
                   className={twMerge(
@@ -53,7 +65,8 @@ const Homepage = () => {
                 >
                   {problem.problemDifficulty.toLocaleLowerCase()}
                 </div>
-                <div className="py-3 px-6">
+
+                <div className="py-3">
                   <span>{problem.topics.join(", ")}</span>
                 </div>
               </div>

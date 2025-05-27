@@ -1,7 +1,7 @@
 import MonacoEditor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import { useEditorStore } from "../../../store/editorStore";
-import { Braces, CodeXml } from "lucide-react";
+import { Braces, CodeXml, LoaderCircle } from "lucide-react";
 import { LanguageSelector } from "./LanguageSelector";
 
 type EditorProps = {
@@ -41,7 +41,12 @@ export const Editor = ({ value, editorRef }: EditorProps) => {
         <div className="flex flex-row justify-between items-center bg-card border-b border-white/10 px-2">
           <LanguageSelector />
           <div className="cursor-pointer hover:bg-white/5 transition-all duration-200 ease-in-out px-1 py-1 rounded-lg">
-            <Braces onClick={formatCode} size={18} />
+            <Braces
+              onClick={formatCode}
+              size={16}
+              data-tooltip-id="main"
+              data-tooltip-content="Format Code"
+            />
           </div>
         </div>
       </div>
@@ -55,6 +60,12 @@ export const Editor = ({ value, editorRef }: EditorProps) => {
           onMount={handleOnMount}
           beforeMount={handleBeforeMount}
           language={language}
+          loading={
+            <div className="flex items-center justify-center gap-2 h-full">
+              <LoaderCircle className="animate-spin" size={20} />
+              <p>Loading Editor...</p>
+            </div>
+          }
           options={{
             selectOnLineNumbers: true,
             automaticLayout: true,

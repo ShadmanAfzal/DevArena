@@ -70,7 +70,10 @@ const Output = ({ handleSubmit }: OutputPropsType) => {
           {isLoading ? (
             <LoaderCircle className="animate-spin" size="16" />
           ) : (
-            <button className="cursor-pointer" onClick={handleSubmit}>
+            <button
+              className="cursor-pointer hover:bg-white/5 transition-all duration-200 ease-in-out px-1 py-1 rounded-lg"
+              onClick={handleSubmit}
+            >
               Submit
             </button>
           )}

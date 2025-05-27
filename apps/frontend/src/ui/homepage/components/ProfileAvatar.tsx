@@ -1,6 +1,6 @@
 import { Popover } from "react-tiny-popover";
 import { useUserStore } from "../../../store/userStore";
-import { UserProfileMenu } from "./UserProfileMenu";
+import { UserProfileMenu } from "./userProfileMenu";
 import { useState } from "react";
 
 const ProfileAvatar = () => {

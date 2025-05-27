@@ -6,7 +6,6 @@
         "packages/*"
     ],
     "devDependencies": {
-        "@types/mustache": "^4.2.6",
         "turbo": "^2.5.3"
     },
     "type": "module",
@@ -16,7 +15,5 @@
         "postinstall": "turbo run build --filter=@dev-arena/shared"
     },
     "packageManager": "npm@10.2.3",
-    "dependencies": {
-        "mustache": "^4.2.0"
-    }
+    "dependencies": {}
 }

@@ -6,8 +6,12 @@ import {
   TestCase,
 } from "@prisma/client/client";
 
-type ProblemWithUserSubmission = Problem &
-  Omit<UserSubmission, "codeSubmission" | "language">;
+type ProblemWithUserSubmission = Omit<
+  Problem,
+  "functionName" | "initialCode"
+> & {
+  userSubmission?: Omit<UserSubmission, "codeSubmission" | "language">;
+};
 
 type UserSubmissionWithTestCases = Problem & {
   testCases: TestCase[];
@@ -24,7 +28,12 @@ class ProblemService {
 
   async getAllProblems(userId?: string): Promise<ProblemWithUserSubmission[]> {
     const questions: ProblemWithUserSubmission[] =
-      await this.prisma.problem.findMany();
+      await this.prisma.problem.findMany({
+        omit: {
+          functionName: true,
+          initialCode: true,
+        },
+      });
 
     if (userId) {
       const attemptedProblems = await this.prisma.attemptedProblem.findMany({
@@ -38,12 +47,17 @@ class ProblemService {
       });
 
       questions.map((question) => {
+        question.userSubmission = {
+          attempted: false,
+          solved: false,
+        };
+
         if (attemptedProblems.find((q) => q.problemId === question.id)) {
-          question.attempted = true;
+          question.userSubmission.attempted = true;
         }
 
         if (solvedProblems.find((q) => q.problemId === question.id)) {
-          question.solved = true;
+          question.userSubmission.solved = true;
         }
       });
     }

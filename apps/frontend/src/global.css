@@ -23,6 +23,14 @@
     @apply bg-background text-foreground font-sans text-[14px];
   }
 
+  .customTooltip {
+    background-color: var(--color-card);
+    opacity: 1 !important;
+    padding: 5px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 7.5px !important;
+  }
+
   .customFont {
     font-size: 15px;
     font-family: "InconsolataGo", monospace;

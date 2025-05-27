@@ -21,6 +21,7 @@ model User {
   email            String             @unique
   profilePicture   String?
   lastActive       DateTime           @default(now())
+  isAdmin          Boolean            @default(false)
   SolvedProblem    SolvedProblem[]
   AttemptedProblem AttemptedProblem[]
 }

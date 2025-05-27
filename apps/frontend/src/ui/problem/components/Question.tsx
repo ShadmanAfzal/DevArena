@@ -15,7 +15,10 @@ export const Question = () => {
       <div className="flex flex-row items-center justify-between">
         <div className="text-xl">{problem.title}</div>
         {problem.userSubmission?.solved && (
-          <CheckCircle2Icon className="text-green-500" size={18} />
+          <div className="flex flex-row gap-1 items-center">
+            <span className="text-white/75">Solved</span>
+            <CheckCircle2Icon className="text-green-500" size={16} />
+          </div>
         )}
       </div>
       <div>
