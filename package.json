@@ -15,5 +15,11 @@
         "postinstall": "turbo run build --filter=@dev-arena/shared"
     },
     "packageManager": "npm@10.2.3",
-    "dependencies": {}
+    "dependencies": {
+        "@prisma/client": "^6.8.2",
+        "@types/express": "^5.0.2",
+        "@types/node": "^22.15.27",
+        "concurrently": "^9.1.2",
+        "prisma": "^6.8.2"
+    }
 }
